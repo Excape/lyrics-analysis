@@ -1,1 +1,2 @@
 billboard.py>=3.0.2
+google-cloud-language>=0.22.2

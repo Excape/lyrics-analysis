@@ -48,13 +48,20 @@ def get_lyrics(charts):
     return charts
 
 
-if __name__ == "__main__":
+def get_existing_charts():
+    charts = None
     if os.path.exists('charts.json'):
         with(open('charts.json', 'r')) as f:
-            data = json.load(f)
-    else:
+            charts = json.load(f)
+    return charts
+
+
+if __name__ == "__main__":
+    data = get_existing_charts()
+    if data is None:
         data = charts.get_charts()
+
     data = get_lyrics(data)
-    print(data)
+
     with(open('lyrics.json', 'w')) as f:
         json.dump(data, f)
