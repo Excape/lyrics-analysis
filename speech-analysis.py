@@ -3,6 +3,7 @@ import json
 from google.cloud import language
 import lyrics
 
+GLAPI_SUPPORTED_LANGS = ['en']
 sentiment_cache = dict()
 
 
@@ -50,6 +51,11 @@ def analyze_song(song):
     # Analyze whole song -> fewer requests to API
     lyrics_concat = '\n'.join(lyrics_parts)
     song['lyrics']['lyrics'] = lyrics_concat
+
+    if lang not in GLAPI_SUPPORTED_LANGS:
+        song['lyrics']['sentiment'] = None
+        return song
+
     song['lyrics']['sentiment'] = get_sentiment_score(
         song['artist'], song['title'], lyrics_concat, lang)
 
