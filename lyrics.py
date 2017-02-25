@@ -3,8 +3,10 @@ import json
 import requests
 import charts
 
+lyrics_cache = dict()
 
-def get_track_lyrics(artist, title):
+
+def fetch_track_lyrics(artist, title):
     """ Returns lyrics when found, None when not found """
 
     MUSIXMATCH_KEY = get_musixmatch_key()
@@ -30,6 +32,15 @@ def get_track_lyrics(artist, title):
         'lyrics': lyrics['lyrics_body'],
         'lang': lyrics['lyrics_language']
     }
+
+
+def get_track_lyrics(artist, title):
+    if (artist, title) in lyrics_cache:
+        print('{} - {} found in cache'.format(artist, title))
+        return lyrics_cache[(artist, title)]
+    lyrics = fetch_track_lyrics(artist, title)
+    lyrics_cache[(artist, title)] = lyrics
+    return lyrics
 
 
 def get_musixmatch_key(path='api-keys/musixmatch'):
