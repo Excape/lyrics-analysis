@@ -1,6 +1,5 @@
 import os
 import json
-import charts
 from google.cloud import language
 import lyrics
 
@@ -33,6 +32,7 @@ def analyze_song(song):
     if song['lyrics'] is None:
         return song
 
+    print("Analyzing song {} - {}".format(song['artist'], song['title']))
     lang = song['lyrics']['lang']
     lyrics_parts = partition_lyrics(song['lyrics']['lyrics'])
 
@@ -45,30 +45,35 @@ def analyze_song(song):
     # analyzed_parts = [analyze_partition(part, lang) for part in lyrics_parts]
 
     # song['lyrics']['lyrics'] = analyzed_parts
-    print(song)
     return song
 
 
-def get_speech_analysis(data):
+def get_speech_analysis_from_lyrics(data):
+    data = {'2016': data['2016'][:3]}
     return {year: list(map(analyze_song, chart)) for year, chart in data.items()}
 
 
 def get_existing_lyrics():
-    lyrics = None
+    data = None
     if os.path.exists('lyrics.json'):
+        print("Load existing lyrics")
         with(open('lyrics.json', 'r')) as f:
-            lyrics = json.load(f)
-    return lyrics
+            data = json.load(f)
+    return data
+
+
+def dump_speech_analysis(data):
+    with(open('speech-analysis.json', 'w')) as f:
+        json.dump(data, f)
+
+
+def get_speech_analysis():
+    data = get_existing_lyrics()
+    if data is None:
+        data = lyrics.get_lyrics()
+    data = get_speech_analysis_from_lyrics(data)
+    dump_speech_analysis(data)
 
 
 if __name__ == "__main__":
-    data = get_existing_lyrics()
-    if data is None:
-        data = lyrics.get_existing_charts()
-        if data is None:
-            data = charts.get_charts()
-        data = lyrics.get_lyrics(data)
-    data = get_speech_analysis(data)
-
-    with(open('speech_analysis.json', 'w')) as f:
-        json.dump(data, f)
+    get_speech_analysis()

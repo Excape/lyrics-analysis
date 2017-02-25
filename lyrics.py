@@ -39,29 +39,38 @@ def get_musixmatch_key(path='api-keys/musixmatch'):
         return f.read()
 
 
-def get_lyrics(charts):
+def get_lyrics_from_charts(charts):
     for year, chart in charts.items():
         for song in chart:
+            print("Getting lyrics for {} - {}".format(song['artist'], song['title']))
             lyrics = get_track_lyrics(song['artist'], song['title'])
-            print(lyrics)
             song['lyrics'] = lyrics
+            if lyrics is None:
+                print("No lyrics found for {} - {}".format(song['artist'], song['title']))
     return charts
 
 
 def get_existing_charts():
     charts = None
     if os.path.exists('charts.json'):
+        print("Load existing charts")
         with(open('charts.json', 'r')) as f:
             charts = json.load(f)
     return charts
 
 
-if __name__ == "__main__":
+def dump_lyrics(data):
+    with(open('lyrics.json', 'w')) as f:
+        json.dump(data, f)
+
+
+def get_lyrics():
     data = get_existing_charts()
     if data is None:
         data = charts.get_charts()
+    data = get_lyrics_from_charts(data)
+    dump_lyrics(data)
 
-    data = get_lyrics(data)
 
-    with(open('lyrics.json', 'w')) as f:
-        json.dump(data, f)
+if __name__ == "__main__":
+    get_lyrics()
