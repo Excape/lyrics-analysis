@@ -41,12 +41,14 @@ def get_musixmatch_key(path='api-keys/musixmatch'):
 
 def get_lyrics_from_charts(charts):
     for year, chart in charts.items():
-        for song in chart:
-            print("Getting lyrics for {} - {}".format(song['artist'], song['title']))
-            lyrics = get_track_lyrics(song['artist'], song['title'])
-            song['lyrics'] = lyrics
-            if lyrics is None:
-                print("No lyrics found for {} - {}".format(song['artist'], song['title']))
+        for month, topten in chart.items():
+            print("Process {}-{}".format(year, month))
+            for song in topten:
+                print("Getting lyrics for {} - {}".format(song['artist'], song['title']))
+                lyrics = get_track_lyrics(song['artist'], song['title'])
+                song['lyrics'] = lyrics
+                if lyrics is None:
+                    print("No lyrics found for {} - {}".format(song['artist'], song['title']))
     return charts
 
 
